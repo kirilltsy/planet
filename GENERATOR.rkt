@@ -107,10 +107,12 @@
                                     (number->string (state-planet sta))) 60 "red")
    400 150 MS)))))
 
+(define (planetname a) (list-ref listofnames a))
+
 (define (renderneig sta)
   (define img (place-image (text "Nearest planets" 20 "green") 100 25 SNEIG))
   (define counter 75)
-  (for-each (lambda (x) (set! img (place-image (text (list-ref listofnames x) 20 "white") 100 counter img)) (set! counter (+ counter  50))) (get-neighbors (state-graph sta) (state-planet sta)))
+  (for-each (lambda (x) (set! img (place-image (text (planetname x) 20 "white") 100 counter img)) (set! counter (+ counter  50))) (get-neighbors (state-graph sta) (state-planet sta)))
   img)
 (define (renderstat sta)
   (define img (place-image (text "Status" 20 "green") 100 25 SSTAT))
@@ -122,7 +124,11 @@
   (set! img (place-image (text "Tasks:" 20 "green") 100 325 img))
   (set! img (place-image (text "Kill Mother-in-law" 20 "white") 100 375 img))
   img)
-(define (rendermain sta) SMAIN)
+(define (rendermain sta)
+  (define img SMAIN)
+  (set! img (place-image (text (string-append "The planet " (planetname (state-planet sta))) 50 "white") 300 50 img))
+  (set! img (place-image (text (string-append "Fly to: " (planetname (list-ref (get-neighbors (state-graph sta) (state-planet sta)) (state-options sta)))) 20 "white") 300 125 img))
+  img)
 (define (render2 sta)
   (place-image (renderneig sta) 100 300 (place-image (renderstat sta) 900 300 (place-image (rendermain sta) 500 300 MS))))
 
@@ -132,6 +138,9 @@
                             [(key=? ke "right") (if (= (+ (state-options sta) 1) (length (get-neighbors (state-graph sta) (state-planet sta))))
                                                     (state (state-planet sta) 0 (state-graph sta))
                                                     (state (state-planet sta) (+ 1 (state-options sta)) (state-graph sta)))]
+                            [(key=? ke "left") (if (= (- (state-options sta) 1) -1)
+                                                    (state (state-planet sta) (- (length (get-neighbors (state-graph sta) (state-planet sta))) 1) (state-graph sta))
+                                                    (state (state-planet sta) (- (state-options sta) 1) (state-graph sta)))]
                             [(key=? ke " ") (state (list-ref (get-neighbors (state-graph sta) (state-planet sta)) (state-options sta)) 0 (state-graph sta))]
                             [else sta]))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
