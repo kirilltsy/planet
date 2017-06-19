@@ -83,51 +83,121 @@
 ;; big-bang component part
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (string->image str size color) (text/font str size color "Russellsquare" "default" 'normal 'normal #f))
+
+(define (icon a) (let ([r (square a "solid" (make-color 250 0 0))]
+                       [w (square a "solid" (make-color 250 250 250))]
+                       [d (square a "solid" (make-color 0 100 0))]
+                       [g (square a "solid" (make-color 0 150 0))]
+                       [b (square a "solid" (make-color 0 200 0))])
+                   (above (beside       d d d d)
+                          (beside     d b b b b d)
+                          (beside     g d d d d g)
+                          (beside   d g g g g g g d)
+                          (beside d b g g g g g g b d)
+                          (beside   d d d d d d d d)
+                          (beside     w r w w r w)
+                          (beside     w w w w w w)
+                          (beside     w w w w w w)
+                          (beside       w w w w))
+                   ))
+
+(define (icon2 a) (let ([b (square a "solid" (make-color 0 0 150))]
+                       [l (square a "solid" (make-color 0 0 250))]
+                       [d (square a "solid" (make-color 0 0 0))]
+                       [s (square a "solid" (make-color 250 200 150))]
+                       [y (square a "solid" (make-color 250 150 100))])
+                   (above (beside         b b)
+                          (beside     b b l l b b)
+                          (beside   b l l y y l l b)
+                          (beside b l l l y y l l l b)
+                          (beside   b d d d d d d b)
+                          (beside     s d d d d s)
+                          (beside     s b s s b s)
+                          (beside     s s s s s s)
+                          (beside     s s d d s s)
+                          (beside       s s s s))
+                   ))
+(define (icon3 a) (let ([b (square a "solid" (make-color 150 100 100))]
+                       [d (square a "solid" (make-color 0 0 0))]
+                       [s (square a "solid" (make-color 250 200 150))]
+                       )
+                   (above (beside     b b b b b b)
+                          (beside     b b b b b b)
+                          (beside   b b b b b b b b)
+                          (beside   b s s s s s s b)
+                          (beside   b s s s s s s b)
+                          (beside     d d d d d d)
+                          (beside     d d s s d d)
+                          (beside     b s s s s b)
+                          (beside     b s s s s b)
+                          (beside       b b b b))
+                   ))
+
+(define (icon4 a) (let ([r (square a "solid" (make-color 250 0 0))]
+                       [w (square a "solid" (make-color 250 250 250))]
+                       [d (square a "solid" (make-color 0 100 0))]
+                       [g (square a "solid" (make-color 0 150 0))]
+                       [b (square a "solid" (make-color 0 200 0))])
+                   (above (beside       g b b g)
+                          (beside       g g g g)
+                          (beside       g g g g)
+                          (beside   d d g g g g d d)
+                          (beside d b b g g g g b b d)
+                          (beside   d d d d d d d d)
+                          (beside     w r w w r w)
+                          (beside     w w w w w w)
+                          (beside       w w w w)
+                          (beside         w w))
+                   ))
+
 (define MS (empty-scene 1000 600 "white"))
 (define SMAIN (empty-scene 600 600 "midnightblue"))
 (define SNEIG (empty-scene 200 600 "midnightblue"))
 (define SSTAT (empty-scene 200 600 "midnightblue"))
+(define SICON (place-image (icon4 20) 100 100 (empty-scene 200 200 "midnightblue")))
 (define (render sta)
   (define b " ")
   (for-each (lambda (x) (set! b (string-append b (number->string x) " "))) (get-neighbors (state-graph sta) (state-planet sta)))
   (place-image
-   (text b 60 "red")
+   (string->image b 60 "red")
    400 350
   (place-image
-   (text "you can fly to planets:"
+   (string->image "you can fly to planets:"
          60 "red")
    400 250
   (place-image
-   (text (string-append "fly to planet "
+   (string->image (string-append "fly to planet "
                         (number->string (list-ref (get-neighbors (state-graph sta) (state-planet sta))
                                                   (state-options sta))))
          60 "red")
    400 450
-  (place-image (text (string-append "now you on planet "
+  (place-image (string->image (string-append "now you on planet "
                                     (number->string (state-planet sta))) 60 "red")
    400 150 MS)))))
 
 (define (planetname a) (list-ref listofnames a))
 
 (define (renderneig sta)
-  (define img (place-image (text "Nearest planets" 20 "green") 100 25 SNEIG))
+  (define img (place-image (string->image "Nearest planets" 20 "green") 100 25 SNEIG))
   (define counter 75)
-  (for-each (lambda (x) (set! img (place-image (text (planetname x) 20 "white") 100 counter img)) (set! counter (+ counter  50))) (get-neighbors (state-graph sta) (state-planet sta)))
+  (for-each (lambda (x) (set! img (place-image (string->image (planetname x) 20 "white") 100 counter img)) (set! counter (+ counter  50))) (get-neighbors (state-graph sta) (state-planet sta)))
   img)
 (define (renderstat sta)
-  (define img (place-image (text "Status" 20 "green") 100 25 SSTAT))
-  (set! img (place-image (text "Healthy" 20 "white") 100 75 img))
-  (set! img (place-image (text "In bag:" 20 "green") 100 125 img))
-  (set! img (place-image (text "C21H23NO5 50 kg" 20 "white") 100 175 img))
-  (set! img (place-image (text "Мивина 31 pieces" 20 "white") 100 225 img))
-  (set! img (place-image (text "Socks 3 pieces" 20 "white") 100 275 img))
-  (set! img (place-image (text "Tasks:" 20 "green") 100 325 img))
-  (set! img (place-image (text "Kill Mother-in-law" 20 "white") 100 375 img))
+  (define img (place-image (string->image "Status" 20 "green") 100 25 SSTAT))
+  (set! img (place-image SICON 100 150 img))
+  (set! img (place-image (string->image "Contrabandista" 20 "white") 100 275 img))
+  (set! img (place-image (string->image "In bag:" 20 "green") 100 325 img))
+  (set! img (place-image (string->image "C21H23NO5 50 kg" 20 "white") 100 375 img))
+  (set! img (place-image (string->image "Мивина 31 pieces" 20 "white") 100 425 img))
+  (set! img (place-image (string->image "Socks 3 pieces" 20 "white") 100 475 img))
+  (set! img (place-image (string->image "Tasks:" 20 "green") 100 525 img))
+  (set! img (place-image (string->image "Kill Mother-in-law" 20 "white") 100 575 img))
   img)
 (define (rendermain sta)
   (define img SMAIN)
-  (set! img (place-image (text (string-append "The planet " (planetname (state-planet sta))) 50 "white") 300 50 img))
-  (set! img (place-image (text (string-append "Fly to: " (planetname (list-ref (get-neighbors (state-graph sta) (state-planet sta)) (state-options sta)))) 20 "white") 300 125 img))
+  (set! img (place-image (string->image (string-append "The planet " (planetname (state-planet sta))) 50 "white") 300 50 img))
+  (set! img (place-image (string->image (string-append "Fly to: " (planetname (list-ref (get-neighbors (state-graph sta) (state-planet sta)) (state-options sta)))) 20 "white") 300 125 img))
   img)
 (define (render2 sta)
   (place-image (renderneig sta) 100 300 (place-image (renderstat sta) 900 300 (place-image (rendermain sta) 500 300 MS))))
@@ -152,8 +222,8 @@
 
 (define g (generate_system))
 (printf (graphviz g))
-(struct state (planet options graph))
-(define sta (state (first (get-vertices g)) 0 g))
+(struct state (planet options graph bad))
+(define sta (state (first (get-vertices g)) 0 g 31))
 ;;(define MAX (length (get-neighbors (state-graph sta) (state-planet sta))))
 (big-bang sta (to-draw render2)
           (on-key keypress)
